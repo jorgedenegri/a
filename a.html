@@ -1,0 +1,134 @@
+function raiz=newton(f,x0,tol)
+  k=0;
+  g=@(x) x-f(x)/derivada(f,x);
+  x1=g(x0);
+  fprintf('|   k   |   x0  |\n');
+  while abs(x1-x0)>=tol
+    fprintf('| %10.6f | %10.6f |\n',k,x1);
+    x0=x1;
+    x1=g(x0);
+    k=k+1;
+  endwhile
+  raiz=x1;
+endfunction
+
+function raiz=secantede(f,x0,err)
+  raiz=x0-f(x0)/derivada(f,x0);
+  c=0;
+  fprintf('|     k    |     a    |\n');  
+  while abs(raiz-x0)>err
+    fprintf('|%10.6f|%10.6f|\n',c,x0) 
+    x0=raiz;
+    raiz=x0-f(x0)/derivada(f,x0);
+    c=c+1;
+  endwhile
+disp(c)
+
+
+function m=bise2(f,a,b,err)
+  m=(a+b)/2;
+  c=0;
+  fprintf('|     k    |     a    |     b    |     m    |\n');  
+  while abs(b-a)>err
+    fprintf('|%10.6f|%10.6f|%10.6f|%10.6f|\n',c,a,b,m) 
+    if f(a)*f(m)<0;
+      b=m;
+    else 
+      a=m;
+    endif
+    m=(a+b)/2;
+    c=c+1;
+  endwhile
+endfunction
+
+
+function s=sim(f,a,n)
+  for i=0:n
+    fprintf('| %6.2f  |   %6.7f    |\n',a,f(a));
+    a=a+0.5;
+  endfor 
+endfunction
+
+function y=secante(g,x0,tol)
+  x1=g(x0,tol);
+  k=1;
+  fprintf('|  k  |    m   |\n');
+  fprintf('|----|-------|\n');
+  while abs(x1-x0)>=tol
+    fprintf('| %6.0f  |   %6.7f    |\n',k,x0);
+    k=k+1;
+    x0=x1;
+    x1=g(x0,tol);
+  endwhile
+  y=x1;
+endfunction
+
+
+
+function y=newton(g,x0,tol)
+  x1=g(x0);
+  k=0;
+  fprintf('|  k  |    m   |\n');
+  fprintf('|----|-------|\n');
+  while abs(x1-x0)>=tol
+    fprintf('| %6.0f  |   %6.7f    |\n',k,x0);
+    k=k+1;
+    x0=x1;
+    x1=g(x0);
+  endwhile
+  y=x1;
+endfunction
+
+
+>> f
+f =
+
+@(x) x .^ 2 - cos (3 * x - 2)
+
+>> g
+g =
+
+@(x) x - f (x) / (2 .* x + 3 * sin (3 * x - 2))
+
+
+ newton(g,0.8,0.0000001)
+
+
+
+>> f1=@(x,h) x-f(x)*h/(f(x+h)-f(x));
+>> secante(f1,0.8,0.0000001)
+
+function ip=intepo(p)
+  n=length(p);
+  for i=1:n-1
+    p(i)=p(i)/(n-(i-1));
+  endfor
+  ip=[p,0];
+endfunction
+
+
+function dp=deripo(p)
+  n=length(p);
+  for i=1:n
+    p(i)=(n-i)*p(i);
+  endfor
+  dp=p(1:n-1);
+endfunction
+
+function p=lagrangep(tx,ty)
+  n=length(tx);
+  L=poly(tx(2:n));
+  p=L*ty(1)/polyval(L,tx(1));
+  for k=2:n
+    L=poly([tx(1:k-1),tx(k+1:n)]);
+    p=p+L*ty(k)/polyval(L,tx(k));
+end
+
+function p=newtonp(tx,ty)
+  n=length(tx);
+  p=[ty(1)];
+  for k=2:n
+    q=poly(tx(1:k-1));
+    A=(ty(k)-polyval(p,tx(k)))/polyval(q, tx(k));
+    p=[0 p]+A*q;
+end
