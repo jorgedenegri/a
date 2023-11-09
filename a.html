@@ -132,3 +132,66 @@ function p=newtonp(tx,ty)
     A=(ty(k)-polyval(p,tx(k)))/polyval(q, tx(k));
     p=[0 p]+A*q;
 end
+function A=romberg(f,a,b,error)
+  r(1,1)=trapecio(f,a,b,1);
+  r(2,1)=trapecio(f,a,b,2);
+  r(2,2)=(4*r(2,1)-r(1,1))/3;
+  k=2;
+  while abs(r(k,k)-r(k,k-1))>=error
+    k=k+1;
+    r(k,1)=trapecio(f,a,b,2^(k-1));
+    for j=2:k
+      r(k,j)= (4^(j-1)*r(k,j-1)-r(k-1,j-1))/(4^(j-1)-1);
+    endfor
+  endwhile
+  A=r;
+endfunction
+function  A= trapecio(fun, a, b, n)
+  h = (b - a) / n;
+  s = 0;
+  for k = 1:n-1
+    s = s + feval(fun, a + k*h);
+  endfor
+  A = (feval(fun, a) + feval(fun, b) + 2 * s) * h / 2;
+endfunction 
+function I=trapecios(f,a,b,n)
+h=(b-a)/n;
+I=0;
+for k=1:n
+    I=I+f(a+(k-1)*h)+f(a+k*h);
+end
+I=I*h/2;
+
+Usando el método de Romberg, hallar el área comprendida entre
+las gráficas y = x, y = e
+−x
+2
+, x = 0 con tres decimales exactos. Para ello:
+a. Graficar la región de integración.
+b. Hallar los puntos de intersección de las gráficas frontera.
+c. Calcular los valores intermedios y póngalos en la siguiente tabla.
+function y= graficaL9( x )
+y1=exp(-x . ^ 2 );
+y2=x.^ 2;
+plot(x,y1,’b’,x,y2, ’g’) , grid on
+>> x = -2: 0 . 0 1: 2;
+>> graficaL9( x )
+function y= funr( x )
+y=exp(−x .^2 ) −x . ^ 2 ;
+>> romberg( ’funr’ , −0.7531 , 0.7531 , 0.000000000001 )
+ans = 0. 979263048134729
+
+
+f = @(x) x^2 - 4;
+g = @(x) x - 2;
+
+initial_guess1 = 0;
+initial_guess2 = 3;
+
+intersection_point1 = fsolve(@(x) f(x) - g(x), initial_guess1);
+intersection_point2 = fsolve(@(x) f(x) - g(x), initial_guess2);
+
+disp(['Punto de intersección 1: (' num2str(intersection_point1) ', ' num2str(f(intersection_point1)) ')']);
+disp(['Punto de intersección 2: (' num2str(intersection_point2) ', ' num2str(f(intersection_point2)) ')']);
+
+
