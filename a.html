@@ -162,36 +162,46 @@ for k=1:n
 end
 I=I*h/2;
 
-Usando el método de Romberg, hallar el área comprendida entre
-las gráficas y = x, y = e
-−x
-2
-, x = 0 con tres decimales exactos. Para ello:
-a. Graficar la región de integración.
-b. Hallar los puntos de intersección de las gráficas frontera.
-c. Calcular los valores intermedios y póngalos en la siguiente tabla.
-function y= graficaL9( x )
-y1=exp(-x . ^ 2 );
-y2=x.^ 2;
-plot(x,y1,’b’,x,y2, ’g’) , grid on
->> x = -2: 0 . 0 1: 2;
->> graficaL9( x )
-function y= funr( x )
-y=exp(−x .^2 ) −x . ^ 2 ;
->> romberg( ’funr’ , −0.7531 , 0.7531 , 0.000000000001 )
-ans = 0. 979263048134729
+      
+function d=EULER(f,t0,y0,T,p)
+  h=T/p;
+  t=zeros(p+1,1);
+  y=zeros(p+1,1);
+  t(1)=t0;
+  y(1)=y0;
+  for i=2:p+1
+    t(i)=t(i-1)+h;
+    y(i)=y(i-1)+h*f(t(i-1),y(i-1));
+  endfor
+  d=[t,y];
+  %P=newtonp(t,y);
+  %a=t0:0.01:t0+T;
+  %plot(a,polyval(P,a));
+  %hold on
+  plot(t,y,"*");
+  %hold off
+endfunction
+
+function d=taylor(f,ft,fy,t0,y0,T,p)
+  h=T/p;
+  t=zeros(p+1,1);
+  y=zeros(p+1,1);
+  t(1)=t0;
+  y(1)=y0;
+  for i=2:p+1
+    t(i)=t(i-1)+h;
+    y(i)=y(i-1)+h*f(t(i-1),y(i-1))+(ft(t(i-1),y(i-1))+fy(t(i-1),y(i-1))*f(t(i-1),y(i-1)))*h^2/2;
+  endfor
+  d=[t,y];
+  %P=newtonp(t,y);
+  %a=t0:0.01:t0+T;
+  %plot(a,polyval(P,a));
+  %hold on
+  plot(t,y,"*");
+  %hold off
+endfunction
 
 
-f = @(x) x^2 - 4;
-g = @(x) x - 2;
-
-initial_guess1 = 0;
-initial_guess2 = 3;
-
-intersection_point1 = fsolve(@(x) f(x) - g(x), initial_guess1);
-intersection_point2 = fsolve(@(x) f(x) - g(x), initial_guess2);
-
-disp(['Punto de intersección 1: (' num2str(intersection_point1) ', ' num2str(f(intersection_point1)) ')']);
-disp(['Punto de intersección 2: (' num2str(intersection_point2) ', ' num2str(f(intersection_point2)) ')']);
-
+syms diff
+      
 
