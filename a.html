@@ -201,6 +201,26 @@ function d=taylor(f,ft,fy,t0,y0,T,p)
   %hold off
 endfunction
 
+      
+%derivada de x con respecto a t f=@(t,x)
+//////      
+f1=@(x) exp(-x.^2)
+f2=@(x) x.^2
+x=-2:0.01:2;
+puntosi=fsolve(@(x) f1(x)-f2(x),0);
+g=@(x) f1(x)-f2(x);
+romberg(g,-puntosi,puntosi,0.000000000001)
+////////
+
+fn=@(x) (exp(-x ^ 2))-(x^2);
+g=@(x) x-fn(x)/ derivada=>(- 2*x - 2*x*exp(-x^2))
+newton(g,-0.5,0.00001)
+
+      
+y'=t*cos(t)+(y/t)+t
+y(1)=1+sin(1)
+[1,4]
+t0=1 y0=1+sin(1) T=3 
 
 syms diff
       
