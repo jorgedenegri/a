@@ -1,0 +1,213 @@
+function m=bise(f,a,b,tol)
+  k=0;
+  while abs(a-b)>tol
+    m=(a+b)/2;
+    fprintf('| %6.0f  | %6.8f |\n',k,m);
+    if f(a)*f(m)<0
+      b=m;
+    else
+      a=m;
+    endif
+    k=k+1;
+  endwhile
+endfunction
+
+function y=newton(g,x0,tol)
+  x1=g(x0);
+  k=0;
+  fprintf('|   k    |     m     |\n');
+  fprintf('|--------|-----------|\n');
+  fprintf('| %6.0f  |   %6.7f   |\n',k,x0);
+  while abs(x1-x0)>=tol
+    k=k+1;
+    fprintf('| %6.0f  |   %6.7f   |\n',k,x1);
+    x0=x1;
+    x1=g(x0);
+  endwhile
+  y=x1;
+endfunction
+
+function I=trapecios(f,a,b,n)
+h=(b-a)/n;
+I=0;
+for k=1:n
+    I=I+f(a+(k-1)*h)+f(a+k*h);
+endfor
+I=I*h/2;
+endfunction
+
+function A = romberg(f,a,b,error)
+  r(1,1) = trapecios(f,a,b,1);
+  r(2,1) = trapecios(f,a,b,2);
+  r(2,2) = (4*r(2,1)-r(1,1))/3;
+  k = 2;
+  while abs(r(k,k) - r(k,k-1))>=error
+    k = k+1;
+    r(k,1) = trapecios(f,a,b,2^(k-1));
+    for j = 2:k
+      r(k,j) = (4^(j-1)*r(k,j-1)-r(k-1,j-1))/(4^(j-1)-1);
+    endfor
+  endwhile
+  A = r(k,k);
+endfunction
+
+function p=newtonp(tx,ty)
+  n=length(tx);
+  p=[ty(1)];
+  for k=2:n
+    q=poly(tx(1:k-1));
+    A=(ty(k)-polyval(p,tx(k)))/polyval(q,tx(k));
+    p=[0 p]+A*q;
+  endfor
+endfunction
+
+
+function EDO(f,ft,fy,ftt,fyy,fty,t0,y0,T,p)
+  [t,y1]=EULER(f,t0,y0,T,p);
+  [t,y2]=HEUN(f,t0,y0,T,p);
+  [t,y3]=TAYLOR(f,ft,fy,t0,y0,T,p);
+  [t,y4]=RK3(f,t0,y0,T,p);
+  [t,y5]=TAYLOR3(f,ft,fy,ftt,fyy,fty,t0,y0,T,p);
+  [t,y6]=RK4(f,t0,y0,T,p);
+  fprintf('|   t   |  EULER   |   HEUN   |   TAYLOR  |   RK3   |  TAYLOR3 |   RK4   |\n');
+  for k=1:p+1
+    fprintf('| %10.6f | %10.6f | %10.6f | %10.6f | %10.6f | %10.6f | %10.6f |\n',t(k),y1(k),y2(k),y3(k),y4(k),y5(k),y6(k));
+  endfor
+  hold on
+  plot(t,y1,'*b')
+  plot(t,y2,'*r')
+  plot(t,y3,'*g')
+  plot(t,y4,'*y')
+  plot(t,y5,'*m')
+  plot(t,y6,'*c')
+  
+  
+  
+endfunction
+
+
+
+function [t,y]=RK4(f,t0,y0,T,p)
+  h=T/p;
+  t=zeros(p+1,1);
+  y=zeros(p+1,1);
+  t(1)=t0;
+  y(1)=y0;
+  for i=2:p+1
+    t(i)=t(i-1)+h;
+    k1=h*f(t(i-1),y(i-1));
+    k2=h*f(t(i-1)+h/2,y(i-1)+k1/2);
+    k3=h*f(t(i-1)+h/2,y(i-1)+k2/2);
+    k4=h*f(t(i-1)+h,y(i-1)+k3);
+    y(i)=y(i-1)+k1/6+k2/3+k3/3+k4/6;
+  endfor
+  %d=[t,y];
+  %plot(t,y,'*');
+endfunction
+
+
+function [t,y]=RK3(f,t0,y0,T,p)
+  h=T/p;
+  t=zeros(p+1,1);
+  y=zeros(p+1,1);
+  t(1)=t0;
+  y(1)=y0;
+  for i=2:p+1
+    t(i)=t(i-1)+h;
+    k1=h*f(t(i-1),y(i-1));
+    k2=h*f(t(i-1)+h/2,y(i-1)+k1/2);
+    k3=h*f(t(i-1)+3*h/4,y(i-1)+3*k2/4);
+    y(i)=y(i-1)+2*k1/9+k2/3+4*k3/9;
+  endfor
+  %d=[t,y];
+  %plot(t,y,'*');
+endfunction
+
+
+function dp=deripo(p)
+  for i=1:length(p)
+    p(i)=(length(p)-i)*p(i);
+  endfor
+  dp=p(1:length(p)-1);
+endfunction
+
+
+function dp=intpo(p)
+  for i=1:length(p)
+    p(i)=p(i)/(length(p)-i+1);
+  endfor
+  dp=[p 0];
+endfunction
+
+
+function [t,y]=HEUN(f,t0,y0,T,p)
+  h=T/p;
+  t=zeros(p+1,1);
+  y=zeros(p+1,1);
+  t(1)=t0;
+  y(1)=y0;
+  for i=2:p+1
+    t(i)=t(i-1)+h;
+    y(i)=y(i-1)+(f(t(i-1),y(i-1))+f(t(i-1)+h,y(i-1)+h*f(t(i-1),y(i-1))))*h/2;
+  endfor
+  %d=[t,y];
+  %plot(t,y,'*');
+endfunction
+
+
+function [t,y]=TAYLOR3(f,ft,fy,ftt,fyy,fty,t0,y0,T,p)
+  h=T/p;
+  t=zeros(p+1,1);
+  y=zeros(p+1,1);
+  t(1)=t0;
+  y(1)=y0;
+  for i=2:p+1
+    t(i)=t(i-1)+h;
+    a=ftt(t(i-1),y(i-1))+2*fty(t(i-1),y(i-1))*f(t(i-1),y(i-1))+fyy(t(i-1),y(i-1))*f(t(i-1),y(i-1))^2+ft(t(i-1),y(i-1))*fy(t(i-1),y(i-1))+fy(t(i-1),y(i-1))^2*f(t(i-1),y(i-1));
+    y(i)=y(i-1)+h*f(t(i-1),y(i-1))+(ft(t(i-1),y(i-1))+fy(t(i-1),y(i-1))*f(t(i-1),y(i-1)))*h^2/2+(a)*h^3/6;
+  endfor
+  %d=[t,y];
+  %P=newtonp(t,y);
+  %a=t0:0.01:t0+T;
+  %plot(a,polyval(P,a));
+  %hold on 
+  %plot(t,y,'*');
+endfunction
+
+
+function [t,y]=TAYLOR(f,ft,fy,t0,y0,T,p)
+  h=T/p;
+  t=zeros(p+1,1);
+  y=zeros(p+1,1);
+  t(1)=t0;
+  y(1)=y0;
+  for i=2:p+1
+    t(i)=t(i-1)+h;
+    y(i)=y(i-1)+h*f(t(i-1),y(i-1))+(ft(t(i-1),y(i-1))+fy(t(i-1),y(i-1))*f(t(i-1),y(i-1)))*h^2/2;
+  endfor
+  %d=[t,y];
+  %P=newtonp(t,y);
+  %a=t0:0.01:t0+T;
+  %plot(a,polyval(P,a));
+  %hold on 
+  %plot(t,y,'*');
+endfunction
+
+
+function [t,y]=EULER(f,t0,y0,T,p)
+  h=T/p;
+  t=zeros(p+1,1);
+  y=zeros(p+1,1);
+  t(1)=t0;
+  y(1)=y0;
+  for i=2:p+1
+    t(i)=t(i-1)+h;
+    y(i)=y(i-1)+h*f(t(i-1),y(i-1));
+  endfor
+  %d=[t,y];
+  %P=newtonp(t,y);
+  %a=t0:0.01:t0+T;
+  %plot(a,polyval(P,a));
+  %hold on 
+  %plot(t,y,'*');
+endfunction
