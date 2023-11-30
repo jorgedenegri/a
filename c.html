@@ -60,3 +60,31 @@ area_2 = quad(area_difference, x_intersections_sorted(2), x_intersections_sorted
 total_area = area_1 + area_2;
 total_area
 
+
+%la pregunta dos no la hace  bien
+
+%pregunta 3
+
+
+% a: Polinomio de Lagrange (P)
+function L = lagrange(x, y)
+    n = length(x);
+    L = zeros(1, n);
+    for k = 1:n
+        p = 1;
+        for j = 1:n
+            if j != k
+                p = conv(p, poly(x(j)))/(x(k)-x(j));
+            end
+        end
+        L = L + y(k)*p;
+    end
+end
+
+% Puntos dados
+X1 = [-4 -3 -1 0 1];
+Y1 = [1 -2 -4 -3 0];
+
+% Polinomio de Lagrange
+P = lagrange(X1, Y1)
+
