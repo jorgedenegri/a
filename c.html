@@ -1,2 +1,62 @@
-holi
-pegar aca
+%pregunta 1
+%Paso 1: Encontrar los Puntos de Intersección
+
+pkg load optim; % Cargar el paquete para fsolve
+
+% Definir los polinomios P(x) y Q(x)
+P = @(x) 15*x.^4 - 3*x.^2 - 40;
+Q = @(x) (sqrt(2)*x - 5 + x.^2) .* (x.^2 - 2 + exp(1)) + 3*x.^5 + 1;
+
+% Función para encontrar las raíces de la ecuación P(x) - Q(x) = 0
+intersection = @(x) P(x) - Q(x);
+
+% Intervalo de búsqueda inicial y encontrar los puntos de intersección
+x_intersections = [];
+for x0 = -3:0.5:3
+    try
+        x_sol = fsolve(intersection, x0);
+        if ~ismember(x_sol, x_intersections)
+            x_intersections(end + 1) = x_sol;
+        end
+    catch
+        % Ignorar errores y continuar
+    end
+end
+x_intersections
+
+%Paso 2: Graficar los Polinomios
+
+% Rango de valores para x
+x_values = linspace(-2, 2, 400);
+
+% Evaluar los polinomios
+P_values = P(x_values);
+Q_values = Q(x_values);
+
+% Crear la gráfica
+figure;
+plot(x_values, P_values, 'b-', 'DisplayName', 'P(x) = 15x^4 - 3x^2 - 40');
+hold on;
+plot(x_values, Q_values, 'r-', 'DisplayName', 'Q(x)');
+legend('show');
+xlabel('x');
+ylabel('y');
+title('Gráfica de los Polinomios P(x) y Q(x)');
+grid on;
+
+%Paso 3: Calcular el Área Encerrada
+
+% Ordenar los puntos de intersección
+x_intersections_sorted = sort(x_intersections);
+
+% Definir la función para la diferencia absoluta
+area_difference = @(x) abs(P(x) - Q(x));
+
+% Calcular el área encerrada en cada intervalo
+area_1 = quad(area_difference, x_intersections_sorted(1), x_intersections_sorted(2));
+area_2 = quad(area_difference, x_intersections_sorted(2), x_intersections_sorted(3));
+
+% Sumar las áreas para obtener el área total encerrada
+total_area = area_1 + area_2;
+total_area
+
