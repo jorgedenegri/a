@@ -116,3 +116,61 @@ xlabel('x');
 ylabel('y');
 title('Gráficos de los Polinomios P y Q');
 grid on;
+
+
+%parte 4
+
+pkg load optim; % Cargar el paquete para fsolve
+
+% Función para encontrar las raíces de la ecuación P(x) - Q(x) = 0
+intersection = @(x) polyval(P, x) - polyval(Q, x);
+
+% Intervalo de búsqueda inicial y encontrar los puntos de intersección
+x_intersections = [];
+for x0 = -4:1
+    try
+        x_sol = fsolve(intersection, x0);
+        if ~ismember(x_sol, x_intersections)
+            x_intersections(end + 1) = x_sol;
+        end
+    catch
+        % Ignorar errores y continuar
+    end
+end
+x_intersections
+
+
+%parte 5
+
+% Función para el método de Romberg
+function A = romberg(f, a, b, error)
+    function I = trapecio(f, a, b, n)
+        x = linspace(a, b, n+1);
+        y = f(x);
+        I = (b - a) * (y(1) + 2*sum(y(2:end-1)) + y(end)) / (2*n);
+    end
+
+    r(1,1) = trapecio(f, a, b, 1);
+    r(2,1) = trapecio(f, a, b, 2);
+    r(2,2) = (4*r(2,1) - r(1,1)) / 3;
+    k = 2;
+    while abs(r(k, k) - r(k, k-1)) >= error
+        k = k + 1;
+        r(k, 1) = trapecio(f, a, b, 2^(k-1));
+        for j = 2:k
+            r(k, j) = (4^(j-1)*r(k, j-1) - r(k-1, j-1)) / (4^(j-1) - 1);
+        end
+    end
+    A = r(k, k);
+end
+
+% Definir la función para la diferencia absoluta entre los polinomios
+area_difference = @(x) abs(polyval(P, x) - polyval(Q, x));
+
+% Suponiendo que x_intersections está ordenado y contiene todos los puntos de intersección
+total_area = 0;
+for i = 1:length(x_intersections)-1
+    total_area += romberg(area_difference, x_intersections(i), x_intersections(i+1), 1e-6);
+end
+total_area
+
