@@ -217,6 +217,14 @@ grid on;
 
 %parte b
 
+% Encontrar los puntos de intersección
+intersections = [];
+for i = 1:length(T)
+    if abs(X(i) - Y(i)) < 1e-3 % Usar un umbral pequeño para la igualdad
+        intersections(end + 1) = T(i);
+    end
+end
+intersections
 
 %parte c
 
