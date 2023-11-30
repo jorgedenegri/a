@@ -66,7 +66,7 @@ total_area
 %pregunta 3
 
 
-% a: Polinomio de Lagrange (P)
+% parte a: Polinomio de Lagrange (P)
 function L = lagrange(x, y)
     n = length(x);
     L = zeros(1, n);
@@ -88,3 +88,31 @@ Y1 = [1 -2 -4 -3 0];
 % Polinomio de Lagrange
 P = lagrange(X1, Y1)
 
+% parte b : Polinomio de Newton (Q)
+
+% Puntos dados
+X2 = [-4 -2 -1 0 1];
+Y2 = [-3 0 3 0 -3];
+
+% Polinomio de Newton (usando tu función newtonp)
+Q = newtonp(X2, Y2)
+
+% parte c: Graficar los Polinomios
+
+% Rango de x para la gráfica
+x_range = linspace(-4, 1, 100);
+
+% Evaluar los polinomios
+P_vals = polyval(P, x_range);
+Q_vals = polyval(Q, x_range);
+
+% Crear la gráfica
+figure;
+plot(x_range, P_vals, 'b-', 'DisplayName', 'Polinomio P (Lagrange)');
+hold on;
+plot(x_range, Q_vals, 'r-', 'DisplayName', 'Polinomio Q (Newton)');
+legend('show');
+xlabel('x');
+ylabel('y');
+title('Gráficos de los Polinomios P y Q');
+grid on;
