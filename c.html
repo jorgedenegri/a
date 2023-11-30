@@ -174,3 +174,37 @@ for i = 1:length(x_intersections)-1
 end
 total_area
 
+
+%pregunta 2
+
+%parte a
+
+% Definir las funciones y sus derivadas
+f1 = @(t, x, y) t^3 * sin(t^2 + 2*x); % dx/dt
+f2 = @(t, x, y) 4*y * cos(y*t^2);    % dy/dt
+
+% Aquí deberías definir las derivadas segunda y tercera para f1 y f2
+
+% Método de Taylor de tercer orden
+function [T, X, Y] = taylor3(f1, f2, t0, x0, y0, T, p)
+    h = T/p;
+    T = t0:h:(t0 + T);
+    X = zeros(1, p+1);
+    Y = zeros(1, p+1);
+    X(1) = x0;
+    Y(1) = y0;
+
+    for i = 2:p+1
+        % Aquí aplicas el método de Taylor de tercer orden para f1 y f2
+        % Incluyendo las derivadas segunda y tercera
+    end
+end
+
+% Resolver las ecuaciones diferenciales
+[T, X, Y] = taylor3(f1, f2, 0, pi, 2, 1, 15);
+
+
+%parte b
+
+
+
