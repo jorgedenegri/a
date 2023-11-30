@@ -1,0 +1,26 @@
+% Definir la ecuación diferencial dx/dt = x*cos(t)
+f = @(t, x) x * cos(t);
+
+% Condiciones iniciales
+x0 = 2;
+t0 = 0;
+
+% Intervalo de tiempo [0, 2] con paso h
+h = 0.1;
+t = t0:h:2;
+
+% Inicializar el vector de soluciones
+x = zeros(size(t));
+x(1) = x0;
+
+% Método de Euler
+for i = 1:length(t) - 1
+    x(i+1) = x(i) + h * f(t(i), x(i));
+end
+
+% Graficar la solución
+plot(t, x, '-o');
+title('Solución numérica con el método de Euler');
+xlabel('t');
+ylabel('x');
+grid on;
