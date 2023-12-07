@@ -260,3 +260,20 @@ for k=1:6
   S=S+F(k*pi/3);
 endfor
 disp(S)
+
+ULTIMOOO
+% Definir la función de la diferencia entre P y Q
+f_diff = @(x) polyval(P, x) - polyval(Q, x);
+
+% Definir los extremos a y b
+a = min([px1, px2]);
+b = max([px1, px2]);
+
+% Especificar el número de subdivisiones (n) para el método de trapecios
+n = 1000;
+
+% Calcular el área utilizando el método de trapecios
+area = trapecios(f_diff, a, b, n);
+
+disp(['Área entre los polinomios P y Q: ' num2str(area)]);
+
