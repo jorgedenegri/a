@@ -11,6 +11,20 @@ function m=bise(f,a,b,tol)
     k=k+1;
   endwhile
 endfunction
+      
+function y=secanten(f,x0,tol)
+  k=0;
+  %x1=g(x0,tol);
+  x1=x0-tol*f(x0)/(f(x0+tol)-f(x0));
+  while abs(x1-x0)>=tol
+    k=k+1;
+    x0=x1;
+    %fprintf('| %6.0f  | %6.8f |\n',k,x0);
+    %x1=g(x0,tol);
+    x1=x0-tol*f(x0)/(f(x0+tol)-f(x0));
+  endwhile
+  y=x1;
+endfunction
 
 function y=newton(g,x0,tol)
   x1=g(x0);
@@ -211,3 +225,38 @@ function [t,y]=EULER(f,t0,y0,T,p)
   %hold on 
   %plot(t,y,'*');
 endfunction
+PUNTOSDEINTERSECCION, AREA DE REGION R
+f1=@(t,x) t^2*sin(t^2+2*x);
+f2=@(t,y) 4*y*cos(y*t^2);
+hold on
+[af1,bf1]=EULERP(f1,0,pi,1,15);
+[af2,bf2]=EULERP(f2,0,2,1,15);
+N1=newtonp(af1,bf1);
+N2=newtonp(af2,bf2);
+g1=@(x) polyval(N1,x)
+a=0:0.01:1;
+plot(a,g1(a),'b')
+g2=@(x) polyval(N2,x)
+plot(a,g2(a))
+h=@(x) g2(x)-g1(x);
+r1=secanten(h,0.1,0.0001)
+r2=secanten(h,0.3,0.0001)
+roots(N1-N2);
+
+ULTIMO EJER
+Q=lagrangep([0,1,2,3,4],[1,-1,0,2,1])
+polyout(Q,'x')
+f=@(t,x) polyval(Q,t)*cos(3*x)
+[t1,x1]=EULER(f,0,1,4,10);
+P=lagrange(t1',x1');
+%g=@(x) polyval(P,x)*exp(-s*x);
+%F=@(s) trapecios(g,0,pi,10000)
+F=@(s) trapecios(@(x) polyval(P,x)*exp(-s*x),0,pi,10000);
+a=0:0.01:4;
+plot(a,F(a))
+
+S=0;
+for k=1:6
+  S=S+F(k*pi/3);
+endfor
+disp(S)
