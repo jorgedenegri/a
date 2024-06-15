@@ -1,0 +1,38 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+int maxToneladas(vector<int>& pesos, int capacidad, int inicio, int fin) {
+    if (inicio == fin) {
+        return pesos[inicio] <= capacidad ? pesos[inicio] : 0;
+    }
+
+    int medio = (inicio + fin) / 2;
+    int izquierda = maxToneladas(pesos, capacidad, inicio, medio);
+    int derecha = maxToneladas(pesos, capacidad, medio + 1, fin);
+
+    if (izquierda + derecha <= capacidad) {
+        return izquierda + derecha;
+    }
+
+    return max(izquierda, derecha);
+}
+
+int main() {
+    int n, k;
+    cout << "Ingrese el numero de contenedores: ";
+    cin >> n;
+    cout << "Ingrese la capacidad del buque en toneladas: ";
+    cin >> k;
+
+    vector<int> pesos(n);
+    cout << "Ingrese los pesos de los contenedores: ";
+    for (int i = 0; i < n; ++i) {
+        cin >> pesos[i];
+    }
+
+    int resultado = maxToneladas(pesos, k, 0, n - 1);
+    cout << "El mqximo número de toneladas cargadas es: " << resultado << std::endl;
+
+    return 0;
+}
